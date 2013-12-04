@@ -45,7 +45,17 @@ public class IntegralImageFeatureIntensity {
 //		InputSanityCheck.checkSameShape(integral,intensity);
 
 		ImplIntegralImageFeatureIntensity.hessianBorder(integral,skip,size,intensity);
-		ImplIntegralImageFeatureIntensity.hessianInner(integral,skip,size,intensity);
+
+		//Check if possible to use Java7 concurrency libs
+		final String javaVersion = System.getProperty("java.specification.version");
+		final String concurrencyModeBlocked = System.getProperty("boofcv.blockConcurrencyMode");
+		if (javaVersion != null && Float.valueOf(javaVersion) >= 1.7 && (concurrencyModeBlocked == null || concurrencyModeBlocked.equals("false"))) {
+			boofcv.alg.feature.detect.intensity.
+				impl.concurrent.
+				ImplIntegralImageFeatureIntensity.hessianInner(integral, skip, size, intensity);
+		} else {
+			ImplIntegralImageFeatureIntensity.hessianInner(integral,skip,size,intensity);
+		}
 	}
 
 	/**
